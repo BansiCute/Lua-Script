@@ -1,5 +1,5 @@
     --IceLion32#7923
-    setfpscap(22)
+    
     local UserInputService = game:GetService("UserInputService")
 
     UserInputService.WindowFocused:Connect(function()
