@@ -1,0 +1,77 @@
+local Moon = game:GetService("Lighting").Sky.MoonTextureId
+-- 9709149431 full Moon
+-- 9709143733 half moon
+local Moonstatus = ""
+local MirageStatus = ""
+local map = game:GetService("Workspace").Map:GetChildren()
+local url = ""
+function Webhook(url,IsMirage,IsFullMoon)
+    local msg = {
+        ["content"] = "@everyone",
+        ["embeds"] = {
+            {
+                ["color"] = tonumber(0x000000),
+                ["title"] = "Webhook ngu cac",
+                ["fields"] = {
+                    {
+                        ["name"] = "Username",
+                        ["value"] = "||"..game.Players.LocalPlayer.Name.."||",
+                        ["inline"] = false
+                    },
+                    {
+                        ["name"] = "Mirage Island:",
+                        ["value"] = IsMirage,
+                        ["inline"] = false,   
+                    },
+                    {
+                        ["name"] = "FullMoon:",
+                        ["value"] = IsFullMoon,
+                        ["inline"] = false,   
+                    },
+                    {
+                        ["name"] = "JobId:",
+                        ["value"] = game.JobId,
+                        ["inline"] = false,   
+                    },
+                    {
+                        ["name"] = "Script:",
+                        ["value"] = 'game:GetService("ReplicatedStorage").__ServerBrowser:InvokeServer("teleport","'..game.JobId..'")',
+                        ["inline"] = false,   
+                    },
+                },
+                ["footer"] = {
+                    ["icon_url"] = "",
+                    ["text"] = "Blox Fruit Checking From IceLion32#7923",
+                }
+            }
+        }
+    }  
+    local response = syn.request(
+        {
+            Url = url,
+            Method = "POST",
+            Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = game:GetService("HttpService"):JSONEncode(msg)
+        }
+    )
+end
+
+while wait() do
+    if Moon == "http://www.roblox.com/asset/?id=9709149431" then
+        Moonstatus = "True"
+    else
+        Moonstatus = "False"
+    end
+    for i,v in pairs(map) do
+        if v.Name == "MysticIsland" then
+            MirageStatus = "True"
+        else
+            MirageStatus = "False"
+        end
+    end
+    if MirageStatus=="True" or Moonstatus == "True" then
+        Webhook(url,MirageStatus,Moonstatus)
+    end
+end
