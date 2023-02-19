@@ -1,0 +1,281 @@
+
+repeat wait() until game:IsLoaded()
+repeat wait() until game.Players
+repeat wait() until game.Players.LocalPlayer
+repeat
+    task.wait()
+    if game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild("Main"):FindFirstChild("ChooseTeam") then
+        if string.find(tostring(getgenv().ChooseTeam), "Pirate") then
+            for i, v in pairs(
+                getconnections(
+                    game:GetService("Players").LocalPlayer.PlayerGui.Main.ChooseTeam.Container.Pirates.Frame.ViewportFrame.TextButton.Activated
+                )
+            ) do
+                v.Function()
+            end
+        elseif string.find(tostring(getgenv().ChooseTeam), "Marine") then
+            for i, v in pairs(
+                getconnections(
+                    game:GetService("Players").LocalPlayer.PlayerGui.Main.ChooseTeam.Container.Marines.Frame.ViewportFrame.TextButton.Activated
+                )
+            ) do
+                v.Function()
+            end
+        else
+            for i, v in pairs(
+                getconnections(
+                    game:GetService("Players").LocalPlayer.PlayerGui.Main.ChooseTeam.Container.Pirates.Frame.ViewportFrame.TextButton.Activated
+                )
+            ) do
+                v.Function()
+            end
+        end
+    end
+until game.Players.LocalPlayer.Team ~= nil
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({IntroText = "YMF",Name = "YMF SERVER HOPPER", HidePremium = false, SaveConfig = true, ConfigFolder = "YMF"})
+local Main = Window:MakeTab({
+	Name = "Main",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+function Notify(title,text,Ti2me)
+    OrionLib:MakeNotification({
+        Name = title,
+        Content = text,
+        Time = Ti2me
+    })
+end
+Regions = {
+    "Singapore",
+    "United States",
+    "Germany",
+    "Hong Kong",
+    "Japan",
+    "France"
+}
+
+local Settings = {}
+local HttpService = game:GetService("HttpService")
+
+local SaveFileName = "Serverhopdata.json"
+
+function SaveSettings()
+  local HttpService = game:GetService("HttpService")
+  if not isfolder("YMF") then
+      makefolder("YMF")
+  end
+  writefile("YMF/" .. SaveFileName, HttpService:JSONEncode(Settings))
+end
+
+function ReadSetting()
+  local s,e = pcall(function()
+      local HttpService = game:GetService("HttpService")
+      if not isfolder("YMF") then
+          makefolder("YMF")
+      end
+      return HttpService:JSONDecode(readfile("YMF/" .. SaveFileName))
+  end)
+  if s then return e
+  else
+      SaveSettings()
+      return ReadSetting()
+  end
+end
+Settings = ReadSetting()
+function HopServer()
+  local function Hop()
+    Notify("Script Status","Finding Server...",5)
+      for i=1,100 do
+          local huhu = game:GetService("ReplicatedStorage").__ServerBrowser:InvokeServer(i)
+          for k,v in pairs(huhu) do
+              if k~=game.JobId and v["Count"] < 10 then
+                  if not Settings[k] or tick() - Settings[k].Time > 60*10  then
+                       Settings[k] = {
+                           Time = tick()
+                       }
+                       foundsv = true
+                       SaveSettings()
+                       OrionLib:MakeNotification({
+                        Name = "Script Status",
+                        Content = "Joining Server ID: "..k.."\nRegion: "..v["Region"],
+                        Image = "rbxassetid://4483345998",
+                        Time = 15
+                    })
+                      game:GetService("ReplicatedStorage").__ServerBrowser:InvokeServer("teleport",k)
+                      return true
+                  elseif tick() - Settings[k].Time > 60*60 then
+                      Settings[k] = nil
+                  end
+              end
+          end
+      end
+      if not foundsv then
+        Notify("Script Status","Didnt Find Any Servers Can Join",10)
+      end
+      return false
+  end
+  if not getgenv().Loaded then
+      local function child(v)
+          if v.Name == "ErrorPrompt" then
+              if v.Visible then
+                  if v.TitleFrame.ErrorTitle.Text == "Teleport Failed" then
+                      HopServer()
+                  end
+              end
+              v:GetPropertyChangedSignal("Visible"):Connect(function()
+                  if v.Visible then
+                      if v.TitleFrame.ErrorTitle.Text == "Teleport Failed" then
+                          HopServer()
+                      end
+                  end
+              end)
+          end
+      end
+      for k,v in pairs(game.CoreGui.RobloxPromptGui.promptOverlay:GetChildren()) do
+          child(v)
+      end
+      game.CoreGui.RobloxPromptGui.promptOverlay.ChildAdded:Connect(child)
+      getgenv().Loaded = true
+  end
+  while not Hop() do wait() end
+  SaveSettings()
+end
+Main:AddButton({
+	Name = "Hop Server",
+	Callback = function()
+      	HopServer()
+
+
+  	end    
+})
+function CheckFullMoon()
+    moon8 = "http://www.roblox.com/asset/?id=9709150401"
+    moon7 = "http://www.roblox.com/asset/?id=9709150086"
+    moon6 = "http://www.roblox.com/asset/?id=9709149680"
+    moon5 = "http://www.roblox.com/asset/?id=9709149431"
+    moon4 = "http://www.roblox.com/asset/?id=9709149052"
+    moon3 = "http://www.roblox.com/asset/?id=9709143733"
+    moon2 = "http://www.roblox.com/asset/?id=9709139597"
+    moon1 = "http://www.roblox.com/asset/?id=9709135895"
+    moonreal = game:GetService("Lighting").Sky.MoonTextureId
+    cofullmoonkothangbeo = "Deo"
+    if moonreal == moon5 or moonreal == moon4 then
+        if moonreal == moon5 then
+            cofullmoonkothangbeo = "Full Moon"
+        elseif moonreal == moon4 then
+            cofullmoonkothangbeo = "Next Night"
+        end
+    end
+    return cofullmoonkothangbeo;
+end
+Main:AddButton({
+	Name = "Check Full Moon",
+	Callback = function()
+      	Notify("Check Full Moon",CheckFullMoon(),15)
+  	end    
+})
+function IsMirageIsland2()
+    if game:GetService("Workspace").Map:FindFirstChild("MysticIsland") then
+        return true
+    else
+        return false
+    end
+end
+function IsMirageIsland()
+    if game:GetService("Workspace").Map:FindFirstChild("MysticIsland") then
+        return "```true```"
+    else
+        return "```false```"
+    end
+end
+function function6()
+    return math.floor(game.Lighting.ClockTime)
+end
+function function7()
+    GameTime = "Error"
+    local c = game.Lighting
+    local c2 = c.ClockTime
+    if c2 >= 16 or c2 < 5 then
+        GameTime = "Night"
+    else
+        GameTime = "Day"
+    end
+    return GameTime
+end
+local AllRequest = http_request or request or HttpPost or syn.request
+function concacmmb()
+    if CheckFullMoon() == "Full Moon" and IsMirageIsland2() then
+        return "@everyone MOM CALLED"
+    elseif IsMirageIsland2() then
+        return "@here MIRAGE NE THANG BEO"
+    else
+        return "No Any Special Events In Here"
+    end
+end
+function WebhookSender(dec)
+    Message = {
+        ["content"] = concacmmb(),
+        ['username'] = "Full Moon Finder 24/7",
+        ["avatar_url"] = "https://media.discordapp.net/attachments/1059858215879311412/1059864410740502578/Ew4kWteXEAAK2Hy.png",
+        ["embeds"]= {
+            {            
+                ["title"]= "Full Moon Checker";["url"]= "https://www.pornhub.com";
+                ["description"]= "Moon Status: ```"..dec.."```\nMirage Island Status: "..IsMirageIsland().."\nServer Time: ```" .. function6() .. " | " .. function7().."```\nPlayers Count: "..game.Players.NumPlayers.."/12\n```\nJobId: "..game.JobId.."\n```".."Script To Join: ```lua\n"..'game:GetService("ReplicatedStorage").__ServerBrowser:InvokeServer("teleport","'..game.JobId..'")'.."\n```Code By: Hlamm";
+                ["footer"] = {
+                    ["text"] = "script Doc la Dong thap ".."\nTime".." : "..os.date("%c").." ("..os.date("%X")..")\nVersion: 1.15 | Lastest Update: 8:35 PM 1/3/2023",
+                    ["icon_url"] = "https://media.discordapp.net/attachments/1059858215879311412/1059864410740502578/Ew4kWteXEAAK2Hy.png"
+                },
+                ["color"]= tonumber(0xe962e2);
+            }
+        }
+    }
+    local DataCallBack = AllRequest({
+		Url = Webhooklink,
+		Method = 'POST',
+		Headers = {
+			["Content-Type"] = "application/json"
+		},
+		Body = game:GetService("HttpService"):JSONEncode(Message)
+	})
+end
+wait(3)
+fofofofo = true
+ Webhooklink = ""
+                --
+spawn(function()
+    while wait() do wait()
+        if AutoFullMoon then
+            if CheckFullMoon() == "Deo" then
+                HopServer()
+                Notify("Script Status","Bad Moon\nHopping...",10)
+                
+            elseif (CheckFullMoon() == "Full Moon") and game:GetService("Workspace").Map:FindFirstChild("MysticIsland") then
+                Webhooklink = ""
+                WebhookSender(CheckFullMoon())
+                wait(15)
+                HopServer()
+                
+            elseif game:GetService("Workspace").Map:FindFirstChild("MysticIsland") then
+                Webhooklink = ""
+                WebhookSender(CheckFullMoon())
+                wait(15)
+                HopServer()
+               
+            elseif (CheckFullMoon() == "Full Moon" or CheckFullMoon() == "Next Night") and fofofofo then
+                Webhooklink = ""
+                WebhookSender(CheckFullMoon())
+                wait(15)
+                HopServer()
+               
+            end
+        end
+    end
+end)
+Main:AddToggle{
+    Default =true,
+    Name = "Auto Hop Until Full Moon Or Next Night",
+    Callback = function(c)
+        AutoFullMoon = c 
+    end
+}
